@@ -1,1 +1,772 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetrVG Quiz – Bachelor Professional Bilanzbuchhaltung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2346e4;
+      --primary-light: #eef3fe;
+      --secondary: #ffffff;
+      --success: #28b779;
+      --error: #ed4c5c;
+      --gray: #7d8597;
+      --shadow: 0 8px 32px rgba(35,70,228,0.10);
+      --radius: 30px;
+      --radius-sm: 14px;
+      --glow: 0 0 20px 2px #c5e0fa, 0 0 40px 4px #a3cdf7;
+    }
+    html, body {
+      background: linear-gradient(120deg, #e3e9fa 0%, #dde7ff 40%, #f3f7ff 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #222;
+      overflow-x: hidden;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: 0;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at 80% 0%, #d2e4ff 0%, #b8d6ff 35%, #f3f7ff 100%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .main-outer {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 42px 0;
+      position: relative;
+      z-index: 2;
+    }
+    .quiz-container {
+      background: var(--secondary);
+      max-width: 620px;
+      width: 97vw;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), var(--glow);
+      padding: 44px 36px 36px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: popIn 1.2s cubic-bezier(.44,2.05,.46,.74);
+      margin-top: 12px;
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.85) translateY(50px);}
+      55% { opacity: 1; transform: scale(1.08) translateY(-8px);}
+      100% { opacity: 1; transform: scale(1) translateY(0);}
+    }
+    .quiz-header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .progress-bar-outer {
+      min-width: 150px;
+      background: rgba(255,255,255,0.90);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 8px rgba(35,70,228,0.07);
+      padding: 10px 20px 7px 20px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      animation: fadeIn 1.4s 0.3s both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0;}
+      to { opacity: 1;}
+    }
+    .progress-label {
+      font-size: 1.01rem;
+      color: var(--gray);
+      font-weight: 600;
+      margin-bottom: 3px;
+      letter-spacing: 0.01em;
+    }
+    .progress-bar-bg {
+      width: 130px;
+      height: 9px;
+      background: #e3eafc;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1px;
+      box-shadow: 0 0 6px #c4d4ff55;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 70%, #57c8fa 100%);
+      border-radius: 8px;
+      transition: width 0.4s cubic-bezier(.59,.13,.29,1.12);
+      box-shadow: 0 0 18px #a3cdf788;
+      animation: pulseBar 2s infinite alternate cubic-bezier(.7,0,.3,1);
+    }
+    @keyframes pulseBar {
+      from { filter: brightness(1.03);}
+      to { filter: brightness(1.18);}
+    }
+    h1 {
+      font-size: 2.22rem;
+      color: var(--primary);
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: 0.01em;
+      flex: 1 1 auto;
+      min-width: 210px;
+      text-shadow: 0 3px 11px #e3eafc80;
+      animation: fadeIn 1.2s 0.1s both;
+    }
+    .motivation {
+      font-size: 1.24rem;
+      color: #28b779;
+      text-align: center;
+      margin-top: 7px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      min-height: 22px;
+      transition: color .4s;
+    }
+    .question {
+      font-size: 1.27rem;
+      font-weight: 600;
+      color: #212b4a;
+      margin-bottom: 32px;
+      margin-top: 18px;
+      min-height: 64px;
+      line-height: 1.38;
+      text-shadow: 0 1px 9px #e7f1ff90;
+      animation: fadeIn 1.15s both;
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 19px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .answer-btn {
+      background: #f4f7fb;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      font-size: 1.11rem;
+      font-weight: 500;
+      color: #243060;
+      cursor: pointer;
+      box-shadow: 0 2px 9px rgba(35,70,228,0.07);
+      outline: none;
+      text-align: left;
+      position: relative;
+      z-index: 1;
+      transition: 
+        background 0.22s, color 0.22s, box-shadow 0.18s, transform .17s cubic-bezier(.8,1.9,.45,1.1);
+    }
+    .answer-btn:hover:not(:disabled) {
+      background: #dbe7ff;
+      color: var(--primary);
+      transform: scale(1.04) translateX(5px);
+      box-shadow: 0 3px 16px #a3cdf777;
+    }
+    .answer-btn.selected {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 2px 16px rgba(35,70,228,0.13), 0 0 16px #57c8fa33;
+      transform: scale(1.04);
+      animation: bounceBtn .32s;
+    }
+    @keyframes bounceBtn {
+      0% {transform: scale(.96);}
+      55% {transform: scale(1.07);}
+      100% {transform: scale(1.02);}
+    }
+    .answer-btn:disabled {
+      opacity: 0.76;
+      cursor: default;
+    }
+    .next-btn {
+      margin-top: 28px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 15px 42px;
+      font-size: 1.07rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 3px 18px rgba(35,70,228,0.11);
+      letter-spacing: 0.01em;
+      transition: background 0.17s, transform 0.14s;
+      animation: fadeIn 1.2s 0.1s both;
+    }
+    .next-btn:active {
+      background: #2238a8;
+      transform: scale(.98);
+    }
+    .result-overview {
+      margin-top: 22px;
+      background: #f6f8fc;
+      border-radius: var(--radius-sm);
+      padding: 20px 10px;
+      box-shadow: 0 1px 7px rgba(35,70,228,0.06);
+    }
+    .result-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 0 5px 0;
+      border-bottom: 1px solid #e3eafc;
+      font-size: 1rem;
+    }
+    .result-row:last-child {
+      border-bottom: none;
+    }
+    .result-icon {
+      font-size: 1.6rem;
+      line-height: 1.1;
+      margin-top: 1px;
+      min-width: 30px;
+      text-align: center;
+    }
+    .correct {
+      color: var(--success);
+      font-weight: 700;
+    }
+    .incorrect {
+      color: var(--error);
+      font-weight: 700;
+    }
+    .explanation {
+      margin-left: 42px;
+      color: var(--gray);
+      font-size: 0.99rem;
+      margin-bottom: 9px;
+      margin-top: 3px;
+      padding-right: 7px;
+    }
+    .score {
+      font-size: 1.48rem;
+      color: var(--primary);
+      margin-top: 13px;
+      margin-bottom: 10px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: .02em;
+      animation: popIn .8s;
+    }
+    .restart-btn, .certificate-btn {
+      margin-top: 18px;
+      background: #fff;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 1.06rem;
+      padding: 11px 26px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.2s, color 0.2s, transform .13s;
+      margin-right: 15px;
+      box-shadow: 0 2px 7px #dbe7ff90;
+    }
+    .restart-btn:hover, .certificate-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: scale(1.06);
+    }
+    .overlay {
+      position: fixed;
+      z-index: 999;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(33,48,96,0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn .6s both;
+    }
+    .name-dialog {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(35,70,228,0.13);
+      padding: 30px 24px 20px 24px;
+      max-width: 95vw;
+      min-width: 290px;
+      text-align: center;
+      animation: popIn .7s;
+    }
+    .name-dialog h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      margin-top: 0;
+      font-size: 1.18rem;
+    }
+    .name-dialog input {
+      padding: 10px 15px;
+      border: 1.5px solid #b8c3ea;
+      border-radius: 10px;
+      width: 80%;
+      font-size: 1.02rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border 0.17s;
+    }
+    .name-dialog input:focus {
+      border-color: var(--primary);
+    }
+    .name-dialog button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 9px #dde7ff70;
+      transition: background .16s;
+    }
+    .name-error {
+      color: var(--error);
+      font-size: 0.99rem;
+      margin-bottom: 5px;
+    }
+    @media (max-width: 620px) {
+      .quiz-container {padding: 18px 2vw;}
+      .progress-bar-outer {min-width: 90px; padding: 7px 6px;}
+      .progress-bar-bg {width: 60px;}
+      .quiz-header-flex {gap:8px;}
+      h1 {font-size: 1.28rem;}
+    }
+  </style>
+</head>
+<body>
+  <canvas class="particles" id="particles"></canvas>
+  <div class="main-outer">
+    <div class="quiz-container" id="quizContainer">
+      <div class="quiz-header-flex">
+        <h1>Betriebsverfassungsrecht-Quiz</h1>
+        <div class="progress-bar-outer">
+          <div class="progress-label" id="progress-label">Frage 1 von 10</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar" style="width:10%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="motivation" id="motivation"></div>
+      <div id="quiz">
+        <!-- Quiz-Frage wird hier eingefügt -->
+      </div>
+    </div>
+  </div>
+  <div id="overlay" style="display:none;">
+    <div class="overlay">
+      <form class="name-dialog" id="nameForm" autocomplete="off" onsubmit="return false;">
+        <h2>Name für das Zertifikat eingeben</h2>
+        <input type="text" id="username" placeholder="Vor- und Nachname" maxlength="60" required>
+        <div id="name-error" class="name-error" style="display:none;"></div>
+        <button type="button" onclick="submitName()">Zertifikat anzeigen</button>
+      </form>
+    </div>
+  </div>
+<script>
+const quizData = [
+  {
+    question: "Wofür steht der Begriff 'Betriebsrat' gemäß § 1 BetrVG?",
+    answers: [
+      "Ein von der Geschäftsleitung gewähltes Gremium",
+      "Die Interessenvertretung der Arbeitnehmer im Betrieb",
+      "Eine staatliche Kontrollstelle im Unternehmen",
+      "Ein Aufsichtsorgan für Arbeitgeber"
+    ],
+    correct: 1,
+    explanation: "Der Betriebsrat ist laut § 1 BetrVG die gewählte Interessenvertretung der Arbeitnehmer eines Betriebs."
+  },
+  {
+    question: "Wie viele Arbeitnehmer müssen mindestens im Betrieb beschäftigt sein, damit ein Betriebsrat gewählt werden kann (§ 1 BetrVG)?",
+    answers: [
+      "mindestens 5 wahlberechtigte Arbeitnehmer, davon 3 wählbar",
+      "mindestens 20 Arbeitnehmer",
+      "mindestens 10 wahlberechtigte Arbeitnehmer",
+      "mindestens 3 Arbeitnehmer"
+    ],
+    correct: 0,
+    explanation: "Laut § 1 Abs. 1 BetrVG müssen mindestens 5 wahlberechtigte Arbeitnehmer im Betrieb beschäftigt sein, von denen 3 wählbar sind."
+  },
+  {
+    question: "Worum geht es schwerpunktmäßig in § 87 BetrVG?",
+    answers: [
+      "Mitbestimmung bei personellen Einzelmaßnahmen",
+      "Mitbestimmung in sozialen Angelegenheiten",
+      "Mitbestimmung bei wirtschaftlichen Angelegenheiten",
+      "Mitbestimmung bei Kündigungen"
+    ],
+    correct: 1,
+    explanation: "§ 87 BetrVG regelt die Mitbestimmung des Betriebsrats in sozialen Angelegenheiten (z.B. Arbeitszeit, Urlaub, Ordnung im Betrieb)."
+  },
+  {
+    question: "Welches Mitbestimmungsrecht hat der Betriebsrat laut § 87 Abs. 1 Nr. 6 BetrVG?",
+    answers: [
+      "Mitbestimmung bei der Gestaltung von Arbeitsplatz, Arbeitsablauf und Arbeitsumgebung",
+      "Mitbestimmung bei der Einführung technischer Einrichtungen zur Überwachung",
+      "Mitbestimmung bei Einstellungen",
+      "Mitbestimmung bei Entgeltgestaltung"
+    ],
+    correct: 1,
+    explanation: "§ 87 Abs. 1 Nr. 6 BetrVG: Der Betriebsrat hat bei der Einführung und Anwendung technischer Einrichtungen, die das Verhalten oder die Leistung der Arbeitnehmer überwachen können, ein zwingendes Mitbestimmungsrecht."
+  },
+  {
+    question: "Was ist gemäß § 99 BetrVG Voraussetzung für eine personelle Einzelmaßnahme (z.B. Einstellung)?",
+    answers: [
+      "Der Betriebsrat muss informiert werden, hat aber kein Mitbestimmungsrecht",
+      "Der Arbeitgeber muss den Betriebsrat anhören",
+      "Der Betriebsrat muss zustimmen (Zustimmungsverfahren)",
+      "Die Einigungsstelle muss immer entscheiden"
+    ],
+    correct: 2,
+    explanation: "Nach § 99 BetrVG muss der Arbeitgeber die Zustimmung des Betriebsrats zu personellen Einzelmaßnahmen (z.B. Einstellungen, Versetzungen) einholen."
+  },
+  {
+    question: "Wie kann der Betriebsrat bei einer verweigerten Zustimmung nach § 99 BetrVG vorgehen?",
+    answers: [
+      "Er kann die Maßnahme stoppen",
+      "Er kann die Einigungsstelle anrufen",
+      "Er kann eine Beschwerde beim Arbeitgeber einlegen",
+      "Er kann sofort ein Gericht anrufen"
+    ],
+    correct: 1,
+    explanation: "Wird die Zustimmung verweigert, kann der Arbeitgeber die Einigungsstelle anrufen. Diese entscheidet über die Durchführung der Maßnahme."
+  },
+  {
+    question: "Welche Bedeutung hat § 95 BetrVG für die Arbeitnehmer?",
+    answers: [
+      "Regelungen zu Personalfragebögen",
+      "Regelungen zur Betriebsvereinbarung",
+      "Regelungen zur Auswahlrichtlinie",
+      "Regelungen zur Kündigung"
+    ],
+    correct: 2,
+    explanation: "§ 95 BetrVG regelt die Auswahlrichtlinien, die der Arbeitgeber mit dem Betriebsrat bei Einstellungen, Versetzungen, Kündigungen vereinbaren kann."
+  },
+  {
+    question: "Welche Aufgabe hat der Betriebsrat laut § 80 BetrVG NICHT?",
+    answers: [
+      "Überwachung der Einhaltung von Gesetzen, Unfallverhütungsvorschriften etc.",
+      "Förderung der Gleichstellung von Frauen und Männern",
+      "Regelung der Arbeitszeit im Alleingang",
+      "Förderung der Integration ausländischer Arbeitnehmer"
+    ],
+    correct: 2,
+    explanation: "Der Betriebsrat kann die Arbeitszeit nicht alleine regeln, sondern hat nur Mitbestimmungs- und Mitwirkungsrechte."
+  },
+  {
+    question: "Was ist nach § 94 BetrVG bei Personalfragebögen erforderlich?",
+    answers: [
+      "Zustimmung des Betriebsrats zur Einführung",
+      "Betriebsratsanhörung",
+      "Zustimmung der Belegschaft",
+      "Nur Information des Betriebsrats"
+    ],
+    correct: 0,
+    explanation: "Nach § 94 BetrVG dürfen Personalfragebögen nur mit Zustimmung des Betriebsrats eingeführt werden."
+  },
+  {
+    question: "Welche Mitwirkungspflicht hat der Arbeitgeber laut BetrVG grundsätzlich?",
+    answers: [
+      "Er kann allein entscheiden",
+      "Er muss den Betriebsrat nur informieren",
+      "Er muss den Betriebsrat beteiligen, wo das Gesetz dies vorschreibt",
+      "Er muss den Betriebsrat immer an allen Entscheidungen beteiligen"
+    ],
+    correct: 2,
+    explanation: "Der Arbeitgeber muss den Betriebsrat nur bei gesetzlich geregelten Mitwirkungs- und Mitbestimmungsrechten beteiligen."
+  }
+];
 
+const motivations = [
+  "🎯 Weiter so! Du schaffst das!",
+  "💡 Super, bleib dran!",
+  "🚀 Klasse, nächste Frage!",
+  "✅ Sehr gut, weiter geht’s!",
+  "🦸‍♂️ Starke Leistung!",
+  "🌟 Bleib motiviert!",
+  "🥳 Du rockst das!",
+  "🧠 Klug gelöst!",
+  "🙌 Wow, fast geschafft!",
+  "🎉 Gleich hast du es!"
+];
+
+let currentQ = 0;
+let userAnswers = [];
+const quizDiv = document.getElementById("quiz");
+const progressLabel = document.getElementById("progress-label");
+const progressBar = document.getElementById("progress-bar");
+const motivationDiv = document.getElementById("motivation");
+let scoreGlobal = 0;
+
+function setMotivation(qIdx) {
+  if (qIdx < motivations.length) motivationDiv.textContent = motivations[qIdx];
+  else motivationDiv.textContent = "🎓 Letzte Frage!";
+  motivationDiv.style.color = "#28b779";
+  motivationDiv.style.animation = "popIn .85s";
+}
+function renderQuestion(idx) {
+  const data = quizData[idx];
+  setMotivation(idx);
+  progressLabel.textContent = `Frage ${idx+1} von ${quizData.length}`;
+  progressBar.style.width = `${((idx+1)/quizData.length)*100}%`;
+  quizDiv.innerHTML = `
+    <div class="question">${data.question}</div>
+    <div class="answers">
+      ${data.answers.map((a,i)=>`
+        <button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>
+      `).join("")}
+    </div>
+  `;
+}
+window.selectAnswer = function(i) {
+  userAnswers[currentQ] = i;
+  Array.from(document.querySelectorAll(".answer-btn")).forEach((btn, idx)=>{
+    btn.classList.toggle('selected', idx===i);
+    btn.disabled = true;
+  });
+  if (quizData[currentQ].correct === i) {
+    launchConfetti();
+    motivationDiv.textContent = "🎉 Richtig! Super!";
+    motivationDiv.style.color = "#2346e4";
+  } else {
+    motivationDiv.textContent = "❌ Das war leider falsch…";
+    motivationDiv.style.color = "#ed4c5c";
+  }
+  setTimeout(()=>{
+    if(currentQ < quizData.length - 1){
+      currentQ++;
+      renderQuestion(currentQ);
+    } else {
+      showResults();
+    }
+  }, 780);
+}
+function showResults() {
+  progressLabel.textContent = "Ergebnis";
+  progressBar.style.width = "100%";
+  scoreGlobal = quizData.filter((q,idx)=>userAnswers[idx]===q.correct).length;
+  motivationDiv.textContent = scoreGlobal === quizData.length
+    ? "🏆 Perfekt! Alles richtig!" 
+    : (scoreGlobal >= quizData.length-2 ? "🌟 Fast alles richtig!" : "🎓 Gut gemacht – weiter üben?");
+  motivationDiv.style.color = "#2346e4";
+  quizDiv.innerHTML = `
+    <div class="score">Dein Ergebnis: ${scoreGlobal} / ${quizData.length} richtig</div>
+    <div class="result-overview">
+      ${quizData.map((q,idx)=>{
+        const right = userAnswers[idx] === q.correct;
+        return `
+          <div class="result-row">
+            <span class="result-icon">${right ? "✅" : "❌"}</span>
+            <span class="${right?"correct":"incorrect"}">Frage ${idx+1}</span>
+            <span>${q.question}</span>
+          </div>
+          ${!right ? `<div class="explanation">
+            Richtige Antwort: <strong>${q.answers[q.correct]}</strong><br>${q.explanation}
+          </div>` : ""}
+        `;
+      }).join("")}
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">Quiz erneut starten</button>
+    <button class="certificate-btn" onclick="showNameDialog()">Zertifikat drucken</button>
+  `;
+  launchConfetti();
+}
+window.restartQuiz = function() {
+  currentQ = 0;
+  userAnswers = [];
+  renderQuestion(currentQ);
+}
+
+// Zertifikat-Dialog und Zertifikatsausgabe
+window.showNameDialog = function() {
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('username').focus();
+  document.getElementById('name-error').style.display = 'none';
+}
+window.submitName = function() {
+  const name = document.getElementById('username').value.trim();
+  if (!name || name.length < 2) {
+    document.getElementById('name-error').textContent = "Bitte gib deinen vollständigen Namen ein.";
+    document.getElementById('name-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('overlay').style.display = 'none';
+  showCertificate(name, scoreGlobal, quizData.length);
+}
+
+function showCertificate(name, score, total) {
+  // Neues Fenster für das Zertifikat öffnen
+  const certWindow = window.open('', '_blank', 'width=700,height=900');
+  const dateStr = new Date().toLocaleDateString('de-DE');
+  certWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="UTF-8">
+      <title>Zertifikat Betriebsverfassungsrecht</title>
+      <style>
+        body {
+          font-family: 'Inter', Arial, sans-serif;
+          background: #f7faff;
+          color: #222;
+          margin: 0; padding: 0;
+        }
+        .cert-container {
+          max-width: 520px;
+          margin: 48px auto 0 auto;
+          background: #fff;
+          border-radius: 26px;
+          box-shadow: 0 8px 32px rgba(35,70,228,0.13);
+          padding: 44px 30px 40px 30px;
+          text-align: center;
+          position: relative;
+        }
+        .cert-title {
+          font-size: 2.1rem;
+          color: #2346e4;
+          font-weight: 700;
+          margin-bottom: 16px;
+        }
+        .cert-line {
+          width: 60px;
+          height: 4px;
+          background: #2346e4;
+          border-radius: 3px;
+          margin: 0 auto 22px auto;
+        }
+        .cert-name {
+          font-size: 1.28rem;
+          color: #212b4a;
+          margin: 24px 0 12px 0;
+          font-weight: 600;
+        }
+        .cert-score {
+          font-size: 1.12rem;
+          color: #2346e4;
+          font-weight: 600;
+          margin-bottom: 18px;
+        }
+        .cert-date {
+          color: #7d8597;
+          font-size: 1.01rem;
+          margin-top: 22px;
+        }
+        .cert-footer {
+          margin-top: 38px;
+          font-size: 0.98rem;
+          color: #7d8597;
+        }
+        .cert-print-btn {
+          margin-top: 30px;
+          background: #2346e4;
+          color: #fff;
+          border: none;
+          padding: 13px 38px;
+          font-size: 1.11rem;
+          border-radius: 12px;
+          cursor: pointer;
+          font-weight: 600;
+          box-shadow: 0 3px 18px rgba(35,70,228,0.10);
+          letter-spacing: 0.01em;
+        }
+        @media print {
+          .cert-print-btn { display: none !important; }
+          body { background: #fff; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="cert-container">
+        <div class="cert-title">Zertifikat</div>
+        <div class="cert-line"></div>
+        <div>Hiermit wird bestätigt, dass</div>
+        <div class="cert-name">${name}</div>
+        <div>das Quiz <b>"Betriebsverfassungsrecht"</b> erfolgreich absolviert hat.</div>
+        <div class="cert-score">Ergebnis: <b>${score} von ${total} Punkten</b></div>
+        <div class="cert-date">Datum: ${dateStr}</div>
+        <button class="cert-print-btn" onclick="window.print()">Zertifikat drucken</button>
+        <div class="cert-footer">Bachelor Professional Bilanzbuchhaltung – Online-Quiz</div>
+      </div>
+    </body>
+    </html>
+  `);
+}
+
+// 🎈 Einfache Partikel-Animation / Confetti
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+let particles = [];
+function resizeParticles() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeParticles();
+window.addEventListener("resize", resizeParticles);
+
+function launchConfetti() {
+  for(let i=0;i<36;i++) {
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: -30,
+      r: 7+Math.random()*6,
+      c: `hsl(${Math.floor(Math.random()*360)},100%,${65+Math.random()*20}%)`,
+      v: 2+Math.random()*4,
+      vx: (Math.random()-.5)*3,
+      rot: Math.random()*6.3,
+      vr: (Math.random()-.5)*0.08
+    });
+  }
+}
+function animateParticles() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=particles.length-1;i>=0;i--) {
+    let p = particles[i];
+    p.y += p.v;
+    p.x += p.vx;
+    p.rot += p.vr;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.c;
+    ctx.globalAlpha = .76;
+    ctx.beginPath();
+    ctx.arc(0,0,p.r,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+    if(p.y>canvas.height+30) particles.splice(i,1);
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// Startanimation für Partikel
+setTimeout(()=>{launchConfetti()},800);
+
+renderQuestion(currentQ);
+</script>
+</body>
+</html>
